@@ -1,5 +1,5 @@
 /* Service worker: l'app si apre anche senza rete. */
-const V="officina-v1";
+const V="officina-v2";
 const SHELL=["./","index.html","manifest.webmanifest","config.js","vendor/lucide.min.js","vendor/three.min.js","vendor/cannon.min.js",
  "icons/icon-192.png","icons/icon-512.png","icons/maskable-512.png","icons/apple-touch-icon.png","icons/favicon-64.png"];
 self.addEventListener("install",e=>{e.waitUntil(caches.open(V).then(c=>c.addAll(SHELL)).then(()=>self.skipWaiting()))});

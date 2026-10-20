@@ -2092,7 +2092,7 @@ async function openMenu(){
   if(db){try{const q=await db.collection("characters").get();list=q.docs.map(d=>({id:d.id,name:d.data().name,cls:(CLASSES[d.data().classId]||{}).name,lv:d.data().level}))}catch(e){}}
   openSheet(`<div class="sh"><h3>Personaggi</h3><button class="iconbtn" data-act="close" aria-label="Chiudi">${ic("x")}</button></div>
    <div style="display:grid;gap:8px">${list.map(c=>`<button class="card" style="text-align:left" data-act="open-char" data-id="${c.id}"><div class="r"><b>${esc(c.name)}</b>${c.id===charId?`<span class="chip on">aperto</span>`:""}</div><span class="muted" style="font-size:14px">${esc(c.cls||"")} ${c.lv||""}</span></button>`).join("")||`<p class="muted" style="margin:0">${db?"Nessun personaggio salvato.":"Modalità locale: i dati restano solo su questo dispositivo."}</p>`}</div>
-   <div class="row"><button class="btn" data-act="new-char">${ic("plus","sm")}Nuovo personaggio</button>${C?`<button class="btn ghost" data-act="copy-json">${ic("copy","sm")}Copia backup</button>`:""}${C&&assets?`<button class="btn ghost" data-act="portrait">${ic("camera","sm")}Cambia ritratto</button>`:""}<button class="btn ghost" data-act="import">${ic("upload","sm")}Importa</button>${window.officinaUser?`<button class="btn ghost" data-act="logout">${ic("log-out","sm")}Esci</button>`:""}</div>
+   <div class="row"><button class="btn" data-act="new-char">${ic("plus","sm")}Nuovo personaggio</button>${C?`<button class="btn ghost" data-act="copy-json">${ic("copy","sm")}Copia backup</button>`:""}${C&&assets?`<button class="btn ghost" data-act="portrait">${ic("camera","sm")}Cambia ritratto</button>`:""}<button class="btn ghost" data-act="import">${ic("upload","sm")}Importa</button>${C?`<button class="btn ghost" data-act="soft-reset">${ic("rotate-ccw","sm")}Soft_reset</button>`:""}${window.officinaUser?`<button class="btn ghost" data-act="logout">${ic("log-out","sm")}Esci</button>`:""}</div>
    ${window.officinaUser?`<p class="lbl" style="margin:0">Accesso come ${esc(window.officinaUser.email||"")}</p>`:""}
    <p class="lbl" style="margin:0">${storeMode==="db"?"Sincronizzato: la stessa scheda su telefono e tablet.":"Salvataggio solo su questo dispositivo."}</p>`);
 }
@@ -2165,6 +2165,16 @@ Object.assign(A,{
     const id=d.name.toLowerCase().normalize("NFD").replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"")||"pg";
     closeSheet();await switchChar(id,d);toast({title:`${d.name} importato.`})},
   logout:()=>{window.officinaLogout?.()},
+  /* Soft_reset: riporta la partita allo stato di partenza senza toccare il personaggio */
+  "soft-reset":()=>{openSheet(`<div class="sh"><h3>Soft_reset</h3><button class="iconbtn" data-act="close" aria-label="Chiudi">${ic("x")}</button></div>
+     <p class="muted" style="margin:0">Riporta ${esc(C.name)} come se aprissi l'app per la prima volta, pronto a giocare.</p>
+     <ul class="restlist"><li><b>Ripristina:</b> PF al massimo (${hpMax()}), PF temporanei, dadi vita, slot incantesimo, TS contro la morte, condizioni, Livello di Indebolimento, Ispirazione eroica, Cannone Arcano, Lampo di Genio e la cronologia dei dadi.</li>
+      <li><b>Non tocca:</b> caratteristiche, livello (${C.level}°), inventario e monete, incantesimi, infusioni, Invenzione Magica e diario.</li></ul>
+     <div class="row"><button class="btn" data-act="soft-reset-ok">${ic("rotate-ccw","sm")}Esegui Soft_reset</button><button class="btn ghost" data-act="close">Annulla</button></div>`)},
+  "soft-reset-ok":()=>{Object.assign(C,{hitDiceUsed:0,death:{s:0,f:0},stable:false,conditions:[],exhaustion:0,slotsUsed:{},inspiration:false,flashUsed:0});
+    C.hp={...C.hp,current:hpMax(),temp:0};C.cannon={...C.cannon,active:false,hp:0,freeUsed:false};
+    diceLog=[];lsSet("oa.log","[]");rollMode="norm";invFilter="tutto";gaugeShown=null;tab="scheda";lsSet("oa.tab",tab);
+    closeSheet();save();render();window.scrollTo(0,0);toast({title:"Soft_reset completato: si riparte da zero."})},
   dsel:t=>{diceSel.f=+t.dataset.f;openDice()},
   dqty:t=>{diceSel.n=t.dataset.set?+t.dataset.set:Math.max(1,Math.min(30,diceSel.n+ +t.dataset.d));openDice()},
   dmod:t=>{diceSel.mod=Math.max(-20,Math.min(20,diceSel.mod+ +t.dataset.d));openDice()},
@@ -2196,7 +2206,7 @@ document.addEventListener("click",e=>{
   const tb=e.target.closest("[data-tab]");if(tb){tab=tb.dataset.tab;lsSet("oa.tab",tab);render();window.scrollTo(0,0);return}
   const t=e.target.closest("[data-act]");if(!t||t.disabled)return;
   if(t.closest("form")&&t.type==="submit")return;
-  if(!C&&!["menu","new-char","new-char-ok","open-char","close","dice","qd","mode2","import","import-ok","logout","dsel","dqty","dmod","droll","rw-close"].includes(t.dataset.act))return;
+  if(!C&&!["menu","new-char","new-char-ok","open-char","close","dice","qd","mode2","import","import-ok","logout","soft-reset","soft-reset-ok","dsel","dqty","dmod","droll","rw-close"].includes(t.dataset.act))return;
   A[t.dataset.act]?.(t,e);
 });
 document.addEventListener("change",e=>{
