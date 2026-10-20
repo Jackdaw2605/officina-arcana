@@ -526,6 +526,8 @@ main{position:relative;z-index:1}
 .exh-pips span{width:12px;height:22px;border-radius:3px;border:1px solid var(--line);background:var(--iron)}
 .exh-pips span.on{background:linear-gradient(#f0b54a,#8a5a12);border-color:var(--warn)}
 .exh-pips span.on.red{background:linear-gradient(#e06a52,#6e160c);border-color:var(--bad)}
+.lvlhp{display:grid;gap:10px;padding:12px;border:1px solid var(--brass-lo);border-radius:10px;background:rgba(201,162,74,.06)}
+.hprolls{display:grid;grid-template-columns:repeat(auto-fill,minmax(80px,1fr));gap:8px;margin-top:6px}
 .restlist{margin:0;padding-left:20px;display:grid;gap:6px;font-size:15px;line-height:1.45}
 .restlist b{color:var(--brass-hi)}
 /* finestra dei tiri */
@@ -846,7 +848,9 @@ const saveVal=k=>mod(k)+(saveProf(k)?pb():0);
 const skillProf=k=>+(C.skills?.[k]||0);
 const skillVal=k=>{const s=SKILLS.find(x=>x[0]===k);return mod(s[2])+Math.floor(pb()*skillProf(k))};
 const subActive=()=>!!SUB()&&C.level>=3;
-function hpMax(){const hd=K().hitDie,c=mod("con");let m=hd+c;for(let i=2;i<=C.level;i++)m+=Math.max(1,hd/2+1+c);return Math.max(1,m+(+C.hp.bonus||0))}
+function hpMax(){const hd=K().hitDie,c=mod("con"),r=C.hpRolls||[];let m=hd+c;
+  for(let i=2;i<=C.level;i++){const roll=+r[i-2];m+=Math.max(1,(roll>0?roll:hd/2+1)+c)}
+  return Math.max(1,m+(+C.hp.bonus||0))}
 function acCalc(){
   const inv=C.inventory||[];
   const arm=inv.find(i=>i.equipped&&i.armor&&i.armor.kind!=="scudo");
@@ -943,6 +947,7 @@ function blank(classId="artificer",name="Nuovo personaggio"){
 }
 function migrate(c){const b=blank(c.classId||"artificer");for(const k in b){if(c[k]===undefined)c[k]=b[k]}
   for(const k of["hp","journal","money","cannon","infusions","death"])c[k]={...b[k],...c[k]};
+  if(!Array.isArray(c.hpRolls))c.hpRolls=[];
   (c.inventory||[]).forEach(i=>{if(i.container===undefined&&i.icon==="backpack")i.container=true});return c}
 
 /* ---------- render ---------- */
@@ -1724,7 +1729,22 @@ function openBag(id){
    <div class="grid baggrid">${kids.map(k=>slotHtml(k)).join("")}<button class="slot add" data-act="item-new" data-parent="${id}" aria-label="Aggiungi qui">${ic("plus")}<span class="n">Aggiungi qui</span></button>${"<div class='slot empty'></div>".repeat(empt)}</div>
    <p class="lbl" style="margin:0">Tocca due volte una borsa qui dentro per aprirla. Per spostare un oggetto, modificalo e scegli “Si trova in”.</p>`);
 }
-let lastTap={},storyOpen=false,portraitOpen=false;
+let lastTap={},storyOpen=false,portraitOpen=false,lvlRoll=null;
+/* Salire di livello: i PF si ottengono tirando il dado vita (PHB 2024, p. 42). */
+function levelupHtml(){
+  const nl=C.level+1,hd=K().hitDie,c=mod("con"),nf=featList().filter(f=>f.lv===nl),ns=K().slots(nl),os=K().slots(C.level),gain=lvlRoll>0?Math.max(1,lvlRoll+c):null;
+  return`<div class="sh"><h3>Livello ${nl}</h3><button class="iconbtn" data-act="close" aria-label="Chiudi">${ic("x")}</button></div>
+   <div class="lvlhp"><div><span class="lbl">Punti ferita massimi</span>
+     <p style="margin:4px 0 0">Tira 1d${hd} ${sgn(c)} (COS), minimo 1.${gain!=null?` <b class="num" style="font-size:22px;color:var(--brass-hi)">+${gain}</b> <span class="muted">(dado ${lvlRoll} ${sgn(c)})</span>`:""}</p></div>
+    <div class="row">${gain==null?`<button class="btn arc" data-act="lvl-roll">${dieSVG(true,hd).replace('class="d8"','class="d8" style="width:22px;height:24px"')}Tira il dado vita</button>`:""}
+     <label class="f" style="width:150px">o il tuo dado al tavolo<input id="lvlRollIn" type="number" min="1" max="${hd}" value="${lvlRoll||""}" placeholder="1–${hd}"></label></div></div>
+   <dl class="kv"><dt>Bonus competenza</dt><dd>${sgn(2+Math.floor((nl-1)/4))}</dd>
+    <dt>Slot</dt><dd>${ns.map((n,i)=>`${i+1}°: ${n}${n!==(os[i]||0)?" ★":""}`).join(" · ")}</dd>
+    <dt>Incantesimi preparati</dt><dd>${K().prepared(nl,castMod())}</dd></dl>
+   <div style="display:grid;gap:8px">${nf.map(f=>`<div class="inf"><b>${esc(f.n)}</b><p>${esc(f.d)}</p></div>`).join("")||"<p class='muted'>Nessun nuovo privilegio a questo livello.</p>"}</div>
+   <div class="row"><button class="btn" data-act="do-levelup" ${gain!=null?"":"disabled"}>${ic("chevrons-up","sm")}Sali di livello</button><button class="btn ghost" data-act="close">Annulla</button></div>
+   ${gain==null?`<p class="lbl" style="margin:0">Prima tira il dado vita o scrivi il risultato del tuo dado.</p>`:""}`}
+document.addEventListener("change",e=>{if(e.target.id==="lvlRollIn"){const v=Math.round(+e.target.value),hd=K().hitDie;lvlRoll=v>=1&&v<=hd?v:null;openSheet(levelupHtml())}});
 function fitQ(t){t.style.height="auto";t.style.height=t.scrollHeight+"px"}
 document.addEventListener("input",e=>{if(e.target.classList?.contains("qtxt"))fitQ(e.target)});
 document.addEventListener("keydown",e=>{if(e.key==="Enter"&&!e.shiftKey&&e.target.classList?.contains("qtxt")){e.preventDefault();e.target.blur()}});
@@ -2055,7 +2075,8 @@ const A={
      <label class="f">PF massimi: correzione<input id="id-hpb" type="number" data-bind="hp.bonus" data-type="num" data-rr="1" value="${+C.hp.bonus||0}"></label>
      <label class="f">CA: correzione<input id="id-acb" type="number" data-bind="acBonus" data-type="num" data-rr="1" value="${+C.acBonus||0}"></label>
     </div>
-    <p class="lbl" style="margin:0">I PF massimi usano la media del dado vita. Usa la correzione se hai tirato i dadi o hai talenti come Robusto.</p>`)},
+    ${C.level>1?`<div><span class="lbl">Tiri dei PF per livello (d${K().hitDie})</span><div class="hprolls">${Array.from({length:C.level-1},(_,i)=>`<label class="f">Liv. ${i+2}<input id="hpr-${i}" type="number" min="1" max="${K().hitDie}" data-bind="hpRolls.${i}" data-type="num" data-rr="1" value="${+C.hpRolls[i]||""}" placeholder="media"></label>`).join("")}</div></div>`:""}
+    <p class="lbl" style="margin:0">PF massimi: al 1° livello il dado vita pieno + COS; a ogni livello dopo il dado vita tirato + COS (minimo 1), registrato quando usi “Sali di livello”. Usa la correzione solo per talenti come Robusto.</p>`)},
   "edit-traits":t=>{const key=t.dataset.list;const txt=(C[key]||[]).map(x=>x.name+" :: "+x.desc).join("\n");
     openSheet(`<div class="sh"><h3>${key==="feats"?"Talenti":"Tratti della specie"}</h3><button class="iconbtn" data-act="close" aria-label="Chiudi">${ic("x")}</button></div>
      <p class="lbl" style="margin:0">Una riga per voce: Nome :: descrizione</p><textarea id="traitsTxt" style="min-height:220px">${esc(txt)}</textarea>
@@ -2153,6 +2174,12 @@ Object.assign(A,{
     else if(t==="flame")saveFlow({...head,dc:spellDC(),saveAb:"dex",dmg:"2d8"+x,dmgType:"fuoco",onSave:"half"});
     else showRoll(head,"1d8"+x+sgn(castMod()).replace("−","-"),{sub:"Cannone Arcano",label:"PF temporanei a te e alle creature entro 3 m"})},
   "rw-close":()=>rwClose(),
+  levelup:()=>openSheet(levelupHtml()),
+  "lvl-roll":()=>{const hd=K().hitDie,nl=C.level+1;
+    showRoll({title:`PF del ${nl}° livello`,icon:dieSVG(true,hd)},`1d${hd}`,{sub:"Dado vita",label:`dado vita · ${sgn(mod("con"))} COS`,onResult:v=>{lvlRoll=v;openSheet(levelupHtml())}})},
+  "do-levelup":()=>{if(!(lvlRoll>0))return;const hd=K().hitDie,gain=Math.max(1,lvlRoll+mod("con")),from=C.level;
+    C.hpRolls=(C.hpRolls||[]).slice(0,from-1);C.hpRolls[from-1]=lvlRoll;C.level=Math.min(20,from+1);C.hp.current+=gain;lvlRoll=null;
+    closeSheet();save();render();levelFx(from,C.level)},
   import:()=>{openSheet(`<div class="sh"><h3>Importa scheda</h3><button class="iconbtn" data-act="close" aria-label="Chiudi">${ic("x")}</button></div>
      <p class="muted" style="margin:0">Scegli il file di backup (.json) oppure incolla il testo copiato con “Copia backup”.</p>
      <input type="file" id="impFile" accept=".json,application/json"><textarea id="impTxt" placeholder="Incolla qui il backup" style="min-height:140px"></textarea>
