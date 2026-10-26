@@ -305,7 +305,8 @@ details.fold .in{padding-top:10px;display:grid;gap:10px}
   position:relative;display:grid;place-items:center;align-content:center;gap:4px;padding:6px;text-align:center}
 .slot .lucide{width:30px;height:30px;color:var(--parch);stroke-width:1.5}
 .slot .n{font-size:10.5px;line-height:1.15;color:var(--muted);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;word-break:break-word}
-.slot .q{position:absolute;right:5px;bottom:3px;font-family:var(--f-num);font-size:14px;color:var(--parch)}
+.slot .q{position:absolute;right:5px;top:4px;min-width:18px;height:18px;padding:0 5px;box-sizing:border-box;border-radius:9px;background:rgba(0,0,0,.55);border:1px solid var(--brass-lo);font-family:var(--f-num);font-size:12px;line-height:16px;text-align:center;color:var(--parch)}
+.bagslot .q{right:30px}
 .slot.eq{border-color:var(--brass);box-shadow:inset 0 0 0 1px rgba(201,162,74,.35),inset 0 2px 6px rgba(0,0,0,.6)}
 .slot.eq::after{content:"";position:absolute;left:5px;top:5px;width:7px;height:7px;transform:rotate(45deg);background:var(--brass)}
 .slot.att{border-color:var(--arcane);box-shadow:0 0 10px rgba(92,200,230,.35),inset 0 2px 6px rgba(0,0,0,.6)}
@@ -1718,7 +1719,7 @@ const kgFmt=v=>v.toLocaleString("it",{maximumFractionDigits:1});
 function bagPath(id){const out=[];let b=C.inventory.find(i=>i.id===id);const seen=new Set();while(b&&!seen.has(b.id)){seen.add(b.id);out.unshift(b);b=inBag(b)}return out}
 function slotHtml(it,showBag){const kids=it.container?C.inventory.filter(i=>i.parent===it.id).length:0,where=showBag&&inBag(it);
   return`<button class="slot c-${it.cat} ${it.equipped?"eq":""} ${it.attuned?"att":""} ${it.tint?"tint-"+it.tint:""} ${it.container?"bagslot":""}" data-act="item" data-id="${it.id}" aria-label="${esc(it.name)}${it.container?", contenitore con "+kids+" oggetti":""}">
-    ${ic(it.icon||"box")}<span class="n">${esc(it.name)}</span>${(+it.qty||1)>1?`<span class="q">${it.qty}</span>`:""}${it.container?`<span class="cnt">${kids}</span>`:""}${where?`<span class="inbag">${ic("shopping-bag","sm")}</span>`:""}</button>`}
+    ${ic(it.icon||"box")}<span class="n">${esc(it.name)}</span>${(+it.qty||1)>1?`<span class="q">×${it.qty}</span>`:""}${it.container?`<span class="cnt">${kids}</span>`:""}${where?`<span class="inbag">${ic("shopping-bag","sm")}</span>`:""}</button>`}
 function openBag(id){
   const b=C.inventory.find(i=>i.id===id);if(!b)return closeSheet();
   const path=bagPath(id),kids=C.inventory.filter(i=>i.parent===id),empt=Math.max(0,Math.ceil((kids.length+1)/4)*4-kids.length-1,7-kids.length);
