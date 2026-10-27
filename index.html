@@ -994,10 +994,23 @@ function blank(classId="artificer",name="Nuovo personaggio"){
     spells:[],tinker:[],infusions:{known:[],active:[]},cannon:{active:false,type:"ballista",hp:0,freeUsed:false},flashUsed:0,
     journal:{story:"",appearance:"",personality:"",ideals:"",bonds:"",flaws:"",npcs:[],quests:[],sessions:[]},portrait:""};
 }
+/* aggiornamenti dei dati fatti una volta sola, direttamente sulla scheda di chi apre l'app
+   (servono per le schede salvate nel database del sito, che da fuori non si possono toccare) */
+let patchedNow=false;
+function dataPatches(c){const done=Array.isArray(c.patches)?c.patches:(c.patches=[]);let ch=false;
+  if(!done.includes("edwyn-munizioni")&&c.classId==="artificer"&&/^edwyn/i.test(c.name||"")){
+    const inv=c.inventory||(c.inventory=[]);
+    const add=(id,name,qty,kg,icon,notes,after)=>{let it=inv.find(i=>!i.weapon&&new RegExp("^"+name.slice(0,7),"i").test(i.name||""));
+      if(!it){it={id:inv.some(i=>i.id===id)?id+"-"+Date.now().toString(36):id,name,cat:"equip",icon,qty,kg,value:"",notes};const k=inv.indexOf(after);inv.splice(k>=0?k+1:inv.length,0,it)}return it};
+    const sun=inv.find(i=>i.weapon&&/^sun\b/i.test(i.name||"")),moon=inv.find(i=>i.weapon&&/^moon\b/i.test(i.name||"")),bal=inv.find(i=>i.weapon&&/balestra/i.test(i.name||""));
+    if(sun||moon){const pr=add("proiettili","Proiettili",10,.02,"circle-dot","Scorta comune di Sun e Moon.",moon||sun);for(const w of[sun,moon])if(w&&!w.weapon.ammo)w.weapon.ammo=pr.id}
+    if(bal){const q=add("quadrelli","Quadrelli",20,.075,"move-right","Munizioni della balestra leggera.",bal);if(!bal.weapon.ammo)bal.weapon.ammo=q.id}
+    c.ammoOn=true;done.push("edwyn-munizioni");ch=true}
+  return ch}
 function migrate(c){const b=blank(c.classId||"artificer");if(c.ammoOn===undefined)c.ammoOn=(c.inventory||[]).some(i=>i.weapon&&/munizioni|ammunition/i.test((i.weapon.props||"")+" "+((i.weapon.alt||{}).props||"")));for(const k in b){if(c[k]===undefined)c[k]=b[k]}
   for(const k of["hp","journal","money","cannon","infusions","death"])c[k]={...b[k],...c[k]};
   if(!Array.isArray(c.hpRolls))c.hpRolls=[];
-  (c.inventory||[]).forEach(i=>{if(i.container===undefined&&i.icon==="backpack")i.container=true});return c}
+  (c.inventory||[]).forEach(i=>{if(i.container===undefined&&i.icon==="backpack")i.container=true});if(dataPatches(c))patchedNow=true;return c}
 
 /* ---------- render ---------- */
 function render(){
@@ -2332,10 +2345,10 @@ async function switchChar(id,fresh){
       if(!snap.exists){loaded=true;if(!C)render();return}
       loaded=true;
       if(dirty||saving||snap.metadata.hasPendingWrites)return;
-      C=migrate(clone(snap.data()));setSync("ok");render();
+      C=migrate(clone(snap.data()));setSync("ok");render();if(patchedNow){patchedNow=false;save()}
     },err=>{setSync("err");toast({title:"Connessione alla scheda interrotta: ricarica la pagina."})});
   }else{
-    const raw=lsGet("oa.local."+id);C=fresh?migrate(fresh):raw?migrate(JSON.parse(raw)):null;if(fresh)save();render();
+    const raw=lsGet("oa.local."+id);C=fresh?migrate(fresh):raw?migrate(JSON.parse(raw)):null;if(fresh||patchedNow){patchedNow=false;save()}render();
   }
   render();
 }
