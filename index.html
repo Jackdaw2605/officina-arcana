@@ -598,6 +598,22 @@ main{position:relative;z-index:1}
 .ibreak>span{font-size:11.5px;line-height:1;padding:3px 6px;border-radius:6px;border:1px solid var(--line);color:var(--muted);display:inline-flex;align-items:center;gap:3px;white-space:nowrap}
 .ibreak .al{border-color:var(--brass-lo);color:var(--brass-hi)}
 .ibreak .lucide{width:12px;height:12px}
+.atk-r{display:flex;align-items:center;gap:8px}
+.ammo{display:inline-flex;align-items:center;gap:4px;height:34px;padding:0 9px;border-radius:10px;border:1px solid var(--line);background:var(--iron);color:var(--muted)}
+.ammo b{font-family:var(--f-num);font-size:17px;color:var(--parch);font-weight:500}
+.ammo.low{border-color:#c98a2e}.ammo.low b{color:#ffc670}
+.ammo.out{border-color:#a3392c}.ammo.out b{color:#ff8a7a}
+.ammo-big{display:flex;align-items:center;justify-content:center;gap:22px;padding:6px 0}
+.ammo-big .num{font-size:64px;line-height:1;min-width:90px;text-align:center}
+.ammo-big.low .num{color:#ffc670}.ammo-big.out .num{color:#ff8a7a}
+.ammo-big .btn{width:58px;height:58px;justify-content:center;border-radius:14px}
+.slot .q.zero{color:#ff8a7a;border-color:#a3392c}
+.feat-tog{display:grid;gap:6px}
+.switch{display:flex;align-items:center;gap:8px;padding:10px 12px;border-radius:10px;border:1px solid var(--line);background:var(--iron);color:var(--parch);text-align:left}
+.switch span{flex:1}
+.switch i{width:38px;height:22px;border-radius:11px;background:#2a2826;position:relative;transition:background .2s}
+.switch i::after{content:"";position:absolute;left:3px;top:3px;width:16px;height:16px;border-radius:50%;background:var(--muted);transition:transform .2s,background .2s}
+.switch.on{border-color:var(--brass-lo)}.switch.on i{background:var(--brass-lo)}.switch.on i::after{transform:translateX(16px);background:var(--brass-hi)}
 </style>
 <div id="bgart" aria-hidden="true"></div>
 
@@ -640,7 +656,7 @@ const ABN=Object.fromEntries(ABIL.map(a=>[a[0],a]));
 const SKILLS=[["acrobatics","Acrobazia","dex"],["animal","Addestrare Animali","wis"],["arcana","Arcano","int"],["athletics","Atletica","str"],["stealth","Furtività","dex"],["investigation","Indagare","int"],["deception","Inganno","cha"],["intimidation","Intimidire","cha"],["performance","Intrattenere","cha"],["insight","Intuizione","wis"],["medicine","Medicina","wis"],["nature","Natura","int"],["perception","Percezione","wis"],["persuasion","Persuasione","cha"],["sleight","Rapidità di Mano","dex"],["religion","Religione","int"],["survival","Sopravvivenza","wis"],["history","Storia","int"]];
 const CONDITIONS=["Accecato","Affascinato","Afferrato","Assordato","Avvelenato","Incapacitato","Invisibile","Paralizzato","Pietrificato","Privo di sensi","Prono","Spaventato","Stordito","Trattenuto"];
 const CATS=[["arma","Armi","sword"],["armatura","Armature","shield"],["strumento","Strumenti","wrench"],["equip","Equipaggiamento","backpack"],["consumabile","Consumabili","flask-conical"],["magico","Magici","sparkles"],["tesoro","Tesori","gem"]];
-const ICONS=[["sword","Spada"],["axe","Ascia"],["crosshair","Arma da fuoco"],["sun","Sole"],["moon","Luna"],["shield","Scudo"],["shirt","Armatura / abito"],["crown","Corona"],["key","Chiave / arnesi"],["lock","Lucchetto"],["wrench","Attrezzi"],["hammer","Martello"],["pickaxe","Piccone"],["shovel","Pala"],["cog","Ingranaggio"],["backpack","Zaino"],["shopping-bag","Borsa"],["package","Pacco"],["box","Scatola"],["flask-conical","Fiala"],["flask-round","Pozione"],["sparkles","Oggetto magico"],["wand","Bacchetta"],["gem","Gemma"],["coins","Monete"],["scroll","Pergamena"],["book","Libro"],["map","Mappa"],["compass","Bussola"],["telescope","Cannocchiale"],["lamp","Lampada"],["flame","Torcia / fuoco"],["hourglass","Clessidra"],["drumstick","Cibo"],["glass-water","Borraccia"],["bandage","Bende"],["tent","Tenda"],["music","Strumento musicale"],["dice-5","Gioco / dadi"],["feather","Piuma / penna"],["bomb","Bomba"],["skull","Teschio"],["bone","Osso"]].sort((a,b)=>a[1].localeCompare(b[1],"it"));
+const ICONS=[["sword","Spada"],["circle-dot","Proiettili"],["move-right","Frecce / quadrelli"],["axe","Ascia"],["crosshair","Arma da fuoco"],["sun","Sole"],["moon","Luna"],["shield","Scudo"],["shirt","Armatura / abito"],["crown","Corona"],["key","Chiave / arnesi"],["lock","Lucchetto"],["wrench","Attrezzi"],["hammer","Martello"],["pickaxe","Piccone"],["shovel","Pala"],["cog","Ingranaggio"],["backpack","Zaino"],["shopping-bag","Borsa"],["package","Pacco"],["box","Scatola"],["flask-conical","Fiala"],["flask-round","Pozione"],["sparkles","Oggetto magico"],["wand","Bacchetta"],["gem","Gemma"],["coins","Monete"],["scroll","Pergamena"],["book","Libro"],["map","Mappa"],["compass","Bussola"],["telescope","Cannocchiale"],["lamp","Lampada"],["flame","Torcia / fuoco"],["hourglass","Clessidra"],["drumstick","Cibo"],["glass-water","Borraccia"],["bandage","Bende"],["tent","Tenda"],["music","Strumento musicale"],["dice-5","Gioco / dadi"],["feather","Piuma / penna"],["bomb","Bomba"],["skull","Teschio"],["bone","Osso"]].sort((a,b)=>a[1].localeCompare(b[1],"it"));
 const iconName=k=>(ICONS.find(i=>i[0]===k)||[k,k])[1];
 const LV_XP=[0,0,300,900,2700,6500,14000,23000,34000,48000,64000,85000,100000,120000,140000,165000,195000,225000,265000,305000,355000];
 
@@ -874,10 +890,28 @@ const spellDC=()=>8+pb()+castMod();
 const spellAtk=()=>pb()+castMod();
 const slotsArr=()=>K().slots(C.level);
 const carryMax=()=>(+C.abilities.str||10)*7.5;
-const invKg=()=>(C.inventory||[]).reduce((s,i)=>s+(+i.kg||0)*(+i.qty||1),0);
+const qtyOf=i=>i&&(i.qty===0||i.qty==="0")?0:(+(i&&i.qty)||1);
+const invKg=()=>(C.inventory||[]).reduce((s,i)=>s+(+i.kg||0)*qtyOf(i),0);
 /* iniziativa: Destrezza + talento Allerta (bonus di competenza) */
 const alertB=()=>(C.feats||[]).some(f=>/^(allerta|alert)\b/i.test((f.name||"").trim()))?pb():0;
 const initB=()=>mod("dex")+alertB();
+/* munizioni: un oggetto dello Zaino fa da scorta; tutte le armi collegate attingono da lì.
+   La funzione si accende dal menu (C.ammoOn). Ogni attacco fatto con l'app ne toglie una;
+   per i tiri al tavolo si scala a mano dal contatore. */
+const ammoOn=()=>!!(C&&C.ammoOn);
+function ammoItem(it,mode){if(!ammoOn()||!it||!it.weapon)return null;const w=it.weapon,id=mode==="alt"&&w.alt?w.alt.ammo:w.ammo;return id?(C.inventory||[]).find(i=>i.id===id)||null:null}
+function ammoChip(it,mode){const a=ammoItem(it,mode);if(!a)return"";const n=qtyOf(a);
+  return`<button class="ammo ${n<=0?"out":n<=5?"low":""}" data-act="ammo" data-id="${a.id}" aria-label="${esc(a.name)}: ne restano ${n}">${ic(a.icon||"move-up-right","sm")}<b>${n}</b></button>`}
+function spendAmmo(it,mode){const a=ammoItem(it,mode);if(!a)return;const n=qtyOf(a);
+  if(n<=0){toast({title:`${a.name}: scorta esaurita!`,br:"Il tiro parte lo stesso: se il conto non è giusto, correggilo dal contatore."});return}
+  a.qty=n-1;save();if(a.qty<=5)toast({title:a.qty?`${a.name}: ne restano ${a.qty}.`:`${a.name}: hai usato l'ultima!`})}
+function ammoSheet(id){const a=(C.inventory||[]).find(i=>i.id===id);if(!a){closeSheet();return}const n=qtyOf(a);
+  const users=[];(C.inventory||[]).filter(i=>i.weapon).forEach(i=>wModes(i).forEach(md=>{const x=ammoItem(i,md);if(x&&x.id===id)users.push(i.name+(wLabel(i,md)?" ("+wLabel(i,md)+")":""))}));
+  openSheet(`<div class="sh"><span class="badgeic">${ic(a.icon||"move-up-right")}</span><h3>${esc(a.name)}</h3><button class="iconbtn" data-act="close" aria-label="Chiudi">${ic("x")}</button></div>
+   <div class="ammo-big ${n<=0?"out":n<=5?"low":""}"><button class="btn" data-act="ammo-d" data-id="${id}" data-d="-1" ${n<=0?"disabled":""} aria-label="Una in meno">${ic("minus")}</button><span class="num">${n}</span><button class="btn ghost" data-act="ammo-d" data-id="${id}" data-d="1" aria-label="Una in più">${ic("plus")}</button></div>
+   <div class="row" style="justify-content:center">${[-5,-2,2,5,10].map(d=>`<button class="btn sm ghost" data-act="ammo-d" data-id="${id}" data-d="${d}" ${d<0&&n<=0?"disabled":""}>${d>0?"+":"−"}${Math.abs(d)}</button>`).join("")}</div>
+   <p class="lbl" style="margin:0;text-align:center">Tiri al tavolo: tocca − per ogni colpo. I tiri fatti con l'app la scalano da soli.</p>
+   ${users.length?`<p class="muted" style="margin:0;font-size:14px">Usata da: ${users.map(esc).join(", ")}</p>`:""}`)}
 /* armi con due modalità (es. lama e arco): la seconda sta in weapon.alt */
 function wMode(it,mode){const w=it.weapon||{};return mode==="alt"&&w.alt?{...it,weapon:{...w,...w.alt,bonus:w.bonus,alt:undefined}}:it}
 const wModes=it=>it.weapon&&it.weapon.alt&&it.weapon.alt.dmg?["","alt"]:[""];
@@ -960,7 +994,7 @@ function blank(classId="artificer",name="Nuovo personaggio"){
     spells:[],tinker:[],infusions:{known:[],active:[]},cannon:{active:false,type:"ballista",hp:0,freeUsed:false},flashUsed:0,
     journal:{story:"",appearance:"",personality:"",ideals:"",bonds:"",flaws:"",npcs:[],quests:[],sessions:[]},portrait:""};
 }
-function migrate(c){const b=blank(c.classId||"artificer");for(const k in b){if(c[k]===undefined)c[k]=b[k]}
+function migrate(c){const b=blank(c.classId||"artificer");if(c.ammoOn===undefined)c.ammoOn=(c.inventory||[]).some(i=>i.weapon&&/munizioni|ammunition/i.test((i.weapon.props||"")+" "+((i.weapon.alt||{}).props||"")));for(const k in b){if(c[k]===undefined)c[k]=b[k]}
   for(const k of["hp","journal","money","cannon","infusions","death"])c[k]={...b[k],...c[k]};
   if(!Array.isArray(c.hpRolls))c.hpRolls=[];
   (c.inventory||[]).forEach(i=>{if(i.container===undefined&&i.icon==="backpack")i.container=true});return c}
@@ -1534,7 +1568,7 @@ function atkPlate(){const ws=(C.inventory||[]).filter(i=>i.weapon&&i.equipped);
   return`<section class="plate"><div class="ph"><h2>Attacchi</h2>${modeSeg()}</div>
    ${ws.flatMap(it0=>wModes(it0).map(md=>{const it=wMode(it0,md),w=wInfo(it0,md),lb=wLabel(it0,md);return`<div class="atk"><span class="badgeic ${it.tint?"tint-"+it.tint:""}">${ic(md==="alt"&&it.weapon.icon?it.weapon.icon:it0.icon||"sword")}</span>
      <div style="min-width:0"><div class="nm">${esc(it.name)}${lb?` <span class="wmode">${esc(lb)}</span>`:""}</div><div class="ds">${esc(w.dmg)} ${esc(it.weapon.type||"")}${it.weapon.props?" · "+esc(it.weapon.props):""}</div></div>
-     <button class="btn sm" data-act="attack" data-id="${it.id}" data-mode="${md}"><span class="hit">${sgn(w.atk)}</span></button></div>`})).join("")||`<p class="muted" style="padding:0 8px">Nessuna arma equipaggiata. Equipaggiale dallo Zaino.</p>`}
+     <div class="atk-r">${ammoChip(it0,md)}<button class="btn sm" data-act="attack" data-id="${it.id}" data-mode="${md}"><span class="hit">${sgn(w.atk)}</span></button></div></div>`})).join("")||`<p class="muted" style="padding:0 8px">Nessuna arma equipaggiata. Equipaggiale dallo Zaino.</p>`}
   </section>`}
 function spellAtkPlate(){const sp=allSpells().filter(s=>(s.dmg||s.kind)&&(s.lvl===0||s.prepared));
   return`<section class="plate"><div class="ph"><h2>Incantesimi</h2>${modeSeg()}</div>
@@ -1668,7 +1702,7 @@ function itemSheet(id,edit){
    <dl class="kv">
     ${w?wModes(it).map(md=>{const x=wMode(it,md),wi=wInfo(it,md),lb=wLabel(it,md);return`${lb?`<dt class="wmh">${esc(lb)}</dt>`:""}<dt>Attacco</dt><dd class="num" style="font-size:20px">${sgn(wi.atk)}</dd><dt>Danni</dt><dd>${esc(wi.dmg)} ${esc(x.weapon.type||"")}</dd>${x.weapon.props?`<dt>Proprietà</dt><dd>${esc(x.weapon.props)}</dd>`:""}`}).join(""):""}
     ${it.armor?`<dt>CA</dt><dd>${it.armor.kind==="scudo"?"+"+(it.armor.base||2):it.armor.base+(it.armor.dexCap===null||it.armor.dexCap===""?" + Des":` + Des (max ${it.armor.dexCap})`)} <span class="muted">(${esc(it.armor.kind)})</span></dd>`:""}
-    <dt>Quantità</dt><dd><span class="row"><button class="iconbtn" data-act="qty" data-id="${it.id}" data-d="-1" aria-label="Meno">${ic("minus","sm")}</button><b class="num" style="font-size:20px">${+it.qty||1}</b><button class="iconbtn" data-act="qty" data-id="${it.id}" data-d="1" aria-label="Più">${ic("plus","sm")}</button></span></dd>
+    <dt>Quantità</dt><dd><span class="row"><button class="iconbtn" data-act="qty" data-id="${it.id}" data-d="-1" aria-label="Meno">${ic("minus","sm")}</button><b class="num" style="font-size:20px">${qtyOf(it)}</b><button class="iconbtn" data-act="qty" data-id="${it.id}" data-d="1" aria-label="Più">${ic("plus","sm")}</button></span></dd>
     <dt>Peso</dt><dd>${it.kg?(+it.kg).toLocaleString("it")+" kg":"—"}${it.container?` <span class="muted">+ ${kgFmt(bagKg(it.id))} kg di contenuto</span>`:""}</dd>
     <dt>Si trova in</dt><dd>${par?bagPath(par.id).map(b=>esc(b.name)).join(" › "):"Zaino"}</dd>
     ${it.value?`<dt>Valore</dt><dd>${esc(it.value)}</dd>`:""}
@@ -1682,6 +1716,7 @@ function itemSheet(id,edit){
     <button class="btn ghost" data-act="item-edit" data-id="${it.id}">${ic("pencil","sm")}Modifica</button>
    </div>`);
 }
+const ammoOpts=(it,cur)=>`<option value="">Nessuna</option>${(C.inventory||[]).filter(i=>!i.weapon&&!i.container&&!i.armor&&i.id!==it.id).map(i=>`<option value="${i.id}" ${cur===i.id?"selected":""}>${esc(i.name)} (${qtyOf(i)})</option>`).join("")}`;
 function itemForm(it,parent){
   const isNew=!it; it=it?clone(it):{id:uid(),name:"",cat:"equip",icon:"box",qty:1,kg:"",value:"",notes:"",parent:parent||undefined};
   const bad=new Set([it.id,...descendants(it.id)]),bags=C.inventory.filter(i=>i.container&&!bad.has(i.id));
@@ -1703,6 +1738,7 @@ function itemForm(it,parent){
     <label class="f">Caratteristica<select id="i-ab" name="ability">${[["str","Forza"],["dex","Destrezza"],["fin","Accurata (la migliore)"]].map(([k,l])=>`<option value="${k}" ${it.weapon?.ability===k?"selected":""}>${l}</option>`).join("")}</select></label>
     <label class="f">Bonus magico<input id="i-wb" name="wbonus" type="number" value="${it.weapon?.bonus||0}"></label>
     <label class="f" style="grid-column:1/-1">Proprietà<input id="i-props" name="props" value="${esc(it.weapon?.props||"")}"></label>
+    ${ammoOn()?`<label class="f" style="grid-column:1/-1">Usa munizioni<select id="i-ammo" name="ammo">${ammoOpts(it,it.weapon?.ammo)}</select></label>`:""}
     <details class="altw" style="grid-column:1/-1" ${it.weapon?.alt?.dmg?"open":""}><summary class="lbl">Arma doppia: seconda modalità (es. lama e arco)</summary>
      <div style="display:grid;gap:8px;grid-template-columns:1fr 1fr;margin-top:8px">
       <label class="f">Nome 1ª modalità<input id="i-wl" name="wlabel" value="${esc(it.weapon?.label||"")}" placeholder="es. lama"></label>
@@ -1711,6 +1747,7 @@ function itemForm(it,parent){
       <label class="f">Tipo<input id="i-at" name="adtype" value="${esc(it.weapon?.alt?.type||"")}" placeholder="perforanti"></label>
       <label class="f">Caratteristica<select id="i-aab" name="aability">${[["str","Forza"],["dex","Destrezza"],["fin","Accurata (la migliore)"]].map(([k,l])=>`<option value="${k}" ${it.weapon?.alt?.ability===k?"selected":""}>${l}</option>`).join("")}</select></label>
       <label class="f">Proprietà<input id="i-ap" name="aprops" value="${esc(it.weapon?.alt?.props||"")}"></label>
+      ${ammoOn()?`<label class="f" style="grid-column:1/-1">Usa munizioni (2ª modalità)<select id="i-aammo" name="aammo">${ammoOpts(it,it.weapon?.alt?.ammo)}</select></label>`:""}
      </div></details>
    </fieldset>
    <fieldset class="full" style="border:1px solid var(--line);border-radius:9px;padding:10px;display:grid;gap:8px;grid-template-columns:1fr 1fr 1fr">
@@ -1726,9 +1763,11 @@ function itemForm(it,parent){
   </form>`);
   $("#itemForm").addEventListener("submit",e=>{e.preventDefault();const f=new FormData(e.target);const g=k=>(f.get(k)||"").toString().trim();
     const old=C.inventory.find(i=>i.id===it.id)||{};
-    const n={...old,id:it.id,name:g("name")||"Oggetto",cat:g("cat"),icon:g("icon"),qty:+g("qty")||1,kg:g("kg")===""?"":+g("kg"),value:g("value"),notes:g("notes"),container:!!f.get("container"),parent:g("parent")||undefined};if(!n.parent)delete n.parent;
+    const n={...old,id:it.id,name:g("name")||"Oggetto",cat:g("cat"),icon:g("icon"),qty:g("qty")===""?1:Math.max(0,Math.round(+g("qty"))||0),kg:g("kg")===""?"":+g("kg"),value:g("value"),notes:g("notes"),container:!!f.get("container"),parent:g("parent")||undefined};if(!n.parent)delete n.parent;
     n.weapon=g("dmg")?{...(old.weapon||{}),dmg:g("dmg"),type:g("dtype"),ability:g("ability"),bonus:+g("wbonus")||0,props:g("props"),label:g("wlabel")}:undefined;
-    if(n.weapon){if(g("admg"))n.weapon.alt={...(old.weapon?.alt||{}),label:g("alabel"),dmg:g("admg"),type:g("adtype"),ability:g("aability"),props:g("aprops")};else delete n.weapon.alt;if(!n.weapon.label)delete n.weapon.label}
+    if(n.weapon){if(g("admg"))n.weapon.alt={...(old.weapon?.alt||{}),label:g("alabel"),dmg:g("admg"),type:g("adtype"),ability:g("aability"),props:g("aprops")};else delete n.weapon.alt;if(!n.weapon.label)delete n.weapon.label;
+      if(f.has("ammo")){if(g("ammo"))n.weapon.ammo=g("ammo");else delete n.weapon.ammo}
+      if(n.weapon.alt&&f.has("aammo")){if(g("aammo"))n.weapon.alt.ammo=g("aammo");else delete n.weapon.alt.ammo}}
     n.armor=g("akind")?{...(old.armor||{}),kind:g("akind"),base:+g("abase")||(g("akind")==="scudo"?2:10),dexCap:g("adex")===""?null:+g("adex")}:undefined;
     if(!n.weapon)delete n.weapon;if(!n.armor)delete n.armor;
     const ix=C.inventory.findIndex(i=>i.id===n.id);if(ix>=0)C.inventory[ix]=n;else C.inventory.push(n);
@@ -1738,12 +1777,12 @@ function itemForm(it,parent){
 /* ---------- borse dentro lo zaino (effetto matrioska) ---------- */
 const inBag=it=>it&&it.parent?C.inventory.find(i=>i.id===it.parent&&i.container):null;
 function descendants(id){const out=[];const walk=p=>C.inventory.forEach(i=>{if(i.parent===p&&!out.includes(i.id)){out.push(i.id);walk(i.id)}});walk(id);return out}
-const bagKg=id=>descendants(id).map(x=>C.inventory.find(i=>i.id===x)).reduce((s,i)=>s+(+i.kg||0)*(+i.qty||1),0);
+const bagKg=id=>descendants(id).map(x=>C.inventory.find(i=>i.id===x)).reduce((s,i)=>s+(+i.kg||0)*qtyOf(i),0);
 const kgFmt=v=>v.toLocaleString("it",{maximumFractionDigits:1});
 function bagPath(id){const out=[];let b=C.inventory.find(i=>i.id===id);const seen=new Set();while(b&&!seen.has(b.id)){seen.add(b.id);out.unshift(b);b=inBag(b)}return out}
 function slotHtml(it,showBag){const kids=it.container?C.inventory.filter(i=>i.parent===it.id).length:0,where=showBag&&inBag(it);
   return`<button class="slot c-${it.cat} ${it.equipped?"eq":""} ${it.attuned?"att":""} ${it.tint?"tint-"+it.tint:""} ${it.container?"bagslot":""}" data-act="item" data-id="${it.id}" aria-label="${esc(it.name)}${it.container?", contenitore con "+kids+" oggetti":""}">
-    ${ic(it.icon||"box")}<span class="n">${esc(it.name)}</span>${(+it.qty||1)>1?`<span class="q">×${it.qty}</span>`:""}${it.container?`<span class="cnt">${kids}</span>`:""}${where?`<span class="inbag">${ic("shopping-bag","sm")}</span>`:""}</button>`}
+    ${ic(it.icon||"box")}<span class="n">${esc(it.name)}</span>${qtyOf(it)!==1?`<span class="q ${qtyOf(it)===0?"zero":""}">×${qtyOf(it)}</span>`:""}${it.container?`<span class="cnt">${kids}</span>`:""}${where?`<span class="inbag">${ic("shopping-bag","sm")}</span>`:""}</button>`}
 function openBag(id){
   const b=C.inventory.find(i=>i.id===id);if(!b)return closeSheet();
   const path=bagPath(id),kids=C.inventory.filter(i=>i.parent===id),empt=Math.max(0,Math.ceil((kids.length+1)/4)*4-kids.length-1,7-kids.length);
@@ -2037,7 +2076,7 @@ const A={
      <div class="row"><button class="btn" data-act="${long?"do-long":"close"}">${ic("check","sm")}${long?"Conferma riposo lungo":"Ok"}</button><button class="btn ghost" data-act="close">Annulla</button></div>`)},
   "do-long":()=>{C.hp.current=hpMax();C.hp.temp=0;C.hitDiceUsed=0;C.slotsUsed={};C.death={s:0,f:0};C.cannon.freeUsed=false;C.flashUsed=0;C.exhaustion=Math.max(0,(+C.exhaustion||0)-1);
     closeSheet();save();render();toast({title:"Riposo lungo completato. Risorse ripristinate."})},
-  attack:t=>{const it=C.inventory.find(i=>i.id===t.dataset.id);if(!it)return;closeSheet();const w=wInfo(it,t.dataset.mode);rollCheck(it.name,w.atk,{dmg:w.dmg,dmgType:wMode(it,t.dataset.mode).weapon.type})},
+  attack:t=>{const it=C.inventory.find(i=>i.id===t.dataset.id);if(!it)return;closeSheet();spendAmmo(it,t.dataset.mode);const w=wInfo(it,t.dataset.mode);rollCheck(it.name,w.atk,{dmg:w.dmg,dmgType:wMode(it,t.dataset.mode).weapon.type})},
   cond:t=>{const c=t.dataset.c;C.conditions=C.conditions.includes(c)?C.conditions.filter(x=>x!==c):[...C.conditions,c];save();render()},
   exh:t=>{C.exhaustion=Math.max(0,Math.min(6,(+C.exhaustion||0)+ +t.dataset.d));save();render()},
   filter:t=>{invFilter=t.dataset.f;render()},
@@ -2047,7 +2086,7 @@ const A={
   "item-del":t=>{const id=t.dataset.id;openSheet(`<div class="sh"><h3>Eliminare l'oggetto?</h3></div><p class="muted" style="margin:0">${esc(C.inventory.find(i=>i.id===id)?.name)} verrà rimosso dallo zaino.</p>
      <div class="row"><button class="btn bad" data-act="item-del-ok" data-id="${id}">${ic("trash-2","sm")}Elimina</button><button class="btn ghost" data-act="item" data-id="${id}">Annulla</button></div>`)},
   "item-del-ok":t=>{C.inventory=C.inventory.filter(i=>i.id!==t.dataset.id);C.infusions.active=C.infusions.active.filter(a=>a.itemId!==t.dataset.id);save();closeSheet();render()},
-  qty:t=>{const it=C.inventory.find(i=>i.id===t.dataset.id);it.qty=Math.max(0,(+it.qty||1)+ +t.dataset.d);save();render();itemSheet(it.id)},
+  qty:t=>{const it=C.inventory.find(i=>i.id===t.dataset.id);it.qty=Math.max(0,qtyOf(it)+ +t.dataset.d);save();render();itemSheet(it.id)},
   equip:t=>{const it=C.inventory.find(i=>i.id===t.dataset.id);it.equipped=!it.equipped;
     if(it.equipped&&it.armor)C.inventory.forEach(o=>{if(o!==it&&o.armor&&(o.armor.kind==="scudo")===(it.armor.kind==="scudo"))o.equipped=false});
     save();render();itemSheet(it.id)},
@@ -2131,6 +2170,9 @@ const A={
   "open-char":t=>{closeSheet();switchChar(t.dataset.id)},
   "copy-json":async()=>{const s=JSON.stringify(C,null,1);try{await navigator.clipboard.writeText(s);toast({title:"Backup copiato negli appunti."})}catch(e){openSheet(`<div class="sh"><h3>Backup</h3><button class="iconbtn" data-act="close" aria-label="Chiudi">${ic("x")}</button></div><textarea id="bk" style="min-height:40vh">${esc(s)}</textarea>`);$("#bk").select()}},
   "qd":t=>rollDamage(t.dataset.d,t.dataset.d),
+  ammo:t=>ammoSheet(t.dataset.id),
+  "ammo-d":t=>{const a=C.inventory.find(i=>i.id===t.dataset.id);if(!a)return;a.qty=Math.max(0,qtyOf(a)+ +t.dataset.d);save();render();ammoSheet(a.id)},
+  "ammo-tog":()=>{C.ammoOn=!C.ammoOn;save();render();openMenu();toast({title:C.ammoOn?"Munizioni attivate: collega le armi alle munizioni da “Modifica oggetto”.":"Munizioni disattivate."})},
 };
 
 async function openMenu(){
@@ -2139,6 +2181,7 @@ async function openMenu(){
   openSheet(`<div class="sh"><h3>Personaggi</h3><button class="iconbtn" data-act="close" aria-label="Chiudi">${ic("x")}</button></div>
    <div style="display:grid;gap:8px">${list.map(c=>`<button class="card" style="text-align:left" data-act="open-char" data-id="${c.id}"><div class="r"><b>${esc(c.name)}</b>${c.id===charId?`<span class="chip on">aperto</span>`:""}</div><span class="muted" style="font-size:14px">${esc(c.cls||"")} ${c.lv||""}</span></button>`).join("")||`<p class="muted" style="margin:0">${db?"Nessun personaggio salvato.":"Modalità locale: i dati restano solo su questo dispositivo."}</p>`}</div>
    <div class="row"><button class="btn" data-act="new-char">${ic("plus","sm")}Nuovo personaggio</button>${C?`<button class="btn ghost" data-act="copy-json">${ic("copy","sm")}Copia backup</button>`:""}${C&&assets?`<button class="btn ghost" data-act="portrait">${ic("camera","sm")}Cambia ritratto</button>`:""}<button class="btn ghost" data-act="import">${ic("upload","sm")}Importa</button>${C?`<button class="btn ghost" data-act="soft-reset">${ic("rotate-ccw","sm")}Soft_reset</button>`:""}${window.officinaUser?`<button class="btn ghost" data-act="logout">${ic("log-out","sm")}Esci</button>`:""}</div>
+   ${C?`<div class="feat-tog"><span class="lbl">Funzioni della scheda</span><button class="switch ${ammoOn()?"on":""}" data-act="ammo-tog" role="switch" aria-checked="${ammoOn()}">${ic("move-up-right","sm")}<span>Munizioni</span><i></i></button></div>`:""}
    ${window.officinaUser?`<p class="lbl" style="margin:0">Accesso come ${esc(window.officinaUser.email||"")}</p>`:""}
    <p class="lbl" style="margin:0">${storeMode==="db"?"Sincronizzato: la stessa scheda su telefono e tablet.":"Salvataggio solo su questo dispositivo."}</p>`);
 }
@@ -2188,7 +2231,7 @@ Object.assign(A,{
   rest:t=>openSheet(t.dataset.r==="long"?longRestHtml():shortRestHtml()),
   "do-long":()=>{C.hp.current=hpMax();C.hp.temp=0;C.hitDiceUsed=0;C.slotsUsed={};C.death={s:0,f:0};C.stable=false;C.cannon.freeUsed=false;C.flashUsed=0;C.exhaustion=Math.max(0,(+C.exhaustion||0)-1);
     C.conditions=C.conditions.filter(c=>c!=="Privo di sensi");closeSheet();save();render();toast({title:"Riposo lungo completato. Risorse ripristinate."})},
-  attack:t=>{const it=C.inventory.find(i=>i.id===t.dataset.id);if(!it)return;closeSheet();const md=t.dataset.mode,w=wInfo(it,md),x=wMode(it,md),lb=wLabel(it,md);
+  attack:t=>{const it=C.inventory.find(i=>i.id===t.dataset.id);if(!it)return;closeSheet();spendAmmo(it,t.dataset.mode);const md=t.dataset.mode,w=wInfo(it,md),x=wMode(it,md),lb=wLabel(it,md);
     attackFlow({title:it.name+(lb?" · "+lb:""),icon:ic(it.icon||"sword"),color:it.tint==="sun"?"var(--brass-hi)":it.tint==="moon"?"#cfd6dc":"",bonus:w.atk,dmg:w.dmg,dmgType:x.weapon.type})},
   cast:t=>castSpellX(t.dataset.id),
   "cast-slot":t=>castSpellX(t.dataset.id,t.dataset.l),
