@@ -1674,6 +1674,7 @@ function castSpellX(id,slot){
   const v=spellLook(s),head={title:s.name+(slot&&slot!=="rit"&&+slot>s.lvl?` · slot ${slot}°`:""),icon:spellGlyph(s),color:v.c};
   if(s.kind==="attack")attackFlow({...head,bonus:spellAtk(),dmg,dmgType:s.dmgType});
   else if(s.kind==="save")saveFlow({...head,dc:spellDC(),saveAb:s.save||"dex",dmg,dmgType:s.dmgType,onSave:s.onSave||"none"});
+  else if((s.kind==="heal"||s.kind==="auto")&&dmg)showRoll(head,dmg,{sub:s.kind==="heal"?"Cura":"Colpisce automaticamente",label:s.kind==="heal"?"PF recuperati":`danni ${s.dmgType||""}`.trim()});
   else toast({title:`${s.name} lanciato${slot&&slot!=="rit"?` (slot di ${slot}° livello)`:""}.`});
   if(s.conc)setTimeout(()=>toast({title:"Concentrazione: ricordati di mantenerla."}),500);
 }
